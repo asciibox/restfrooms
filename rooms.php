@@ -16,7 +16,7 @@ if (!is_numeric($friends)) die("Please provide either 1 (true) or 0 (false) for 
 <link href="body.css" rel="stylesheet" type="text/css" media="screen" />
 <script src="js/jquery.min.js"></script>
 <script src="js/rooms.js"></script>
-<body onload="getRoomList(<?=$owner_user_id?>, <?php if ($friends==1) echo "'FRIENDS'"; ?>);">
+<body onload="getRoomList(<?=$owner_user_id?>, <?php if ($friends==1) echo "'FRIENDS'"; else echo "''"; ?>);">
    <?php include("views_subs/room_table.php"); ?>
 <input type="button" value="Back" onclick="window.location.href='index.php';">
 <span id="editor" style="display:none;">

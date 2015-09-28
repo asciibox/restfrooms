@@ -46,6 +46,9 @@
                               var additional="";
                               
                               if (mode=="INVITE") {
+                                  if (friendarray.already_room_member==1) {
+                                    additional="<td>Already a member of this room</td>";
+                                  } else
                                   if (friendarray.invited==0) {
                                     additional="<td><input type='button' id='invitebutton"+id+"' value='invite' onclick='inviteUserToRoom("+invite_by_user+", "+id+", "+invite_to_room+")'></td>";
                                   } else {

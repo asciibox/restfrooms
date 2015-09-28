@@ -204,7 +204,7 @@ if (strcmp($action, "getfriendlistarray")==0) {
     if (isset($_GET['mode'])) $mode=$_GET['mode']; 
     
     
-    if (strcmp($mode,"inverse")!=0) {
+    if (strcmp($mode,"inverse")!=0) { // If this is != "inverse"
         // Get those to which the user ($origin_user_id) is a friend
         $friendids=getFriendIDS($origin_user_id);
     } else {
@@ -231,6 +231,16 @@ if (strcmp($action, "getfriendlistarray")==0) {
                     } else {
                                 $row['invited']=0;
                     }
+                    
+                    $sql2="SELECT * FROM roommembers WHERE (origin_room_id=".$invite_to_room.") AND (member_id=".$row['id'].")";
+                    $query2=DBi::$conn->query($sql2) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+                    if ($row2=$query2->fetch_assoc())
+                    {
+                                $row['already_room_member']=1;
+                    } else {
+                                $row['already_room_member']=0;
+                    }
+                    
              }
              
              
@@ -435,7 +445,7 @@ if (strcmp($action, "getjoinedrooms")==0) {
              $roomlist[]=$row['name'];
              
          } else {
-             $roomlist[]="not found (".$friendids[$i].")";
+             $roomlist[]="not found (".$roomids[$i].")";
          }
     }
     echo json_encode(array("status" => 1, "roomlist" => $roomlist));

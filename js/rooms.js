@@ -80,9 +80,13 @@
          }
         
          var additional_parameters="";
-         if (mode=="INVITE") {
-             additional_parameters="&invitation_by="+invitation_by;
+         if (mode.indexOf("INVITE")!=-1) {
+             additional_parameters+="&invitation_by="+invitation_by;
          }
+         if (mode.indexOf("FRIENDS")!=-1) {
+             additional_parameters+="&friends=1";
+         }
+         
          counter=0;
          $.ajax({
                         url: "rest.php?action=getroomlist"+additional_parameters+"&owner_user_id="+userid,
@@ -119,7 +123,7 @@
                                         additional_buttons="Already invited";    
                                     } else {
                                       
-                                        additional_buttons=("<input type='button' value='Invite this user to rooms on the following page' onclick=\"inviteByUserToRoom("+userid+", "+id+")\">");
+                                        additional_buttons=("<input type='button' value='Invite users on the following page to room "+name+"' onclick=\"inviteByUserToRoom("+userid+", "+id+")\">");
                                     }
                                } else
                                     additional_buttons=("<input type='button' value='Delete room' onclick=\"deleteRoom("+id+");\"><input type='button' value='Edit room' onclick=\"editRoom("+id+");\">");
@@ -184,13 +188,14 @@
                                var name = array.name;
                                
                                var confirm="";
-                               var dodelete="<input type='button' value='Delete' onclick='deleteroominvitation("+id+");'>";
+                               var dodelete="<input type='button' id='deletebutton"+id+"' value='Delete invitation' onclick='deleteroominvitation("+id+");'>";
                                if (direction=="incoming") {
                                   
-                                    if (array.confirmed==0) {
-                                    confirm="<input type='button' value='Confirm' onclick='confirm("+user_id+", "+id+")'>";
+                                  
+                                    if (array.already_room_member==0) {
+                                        confirm="<input type='button' id='confirmbutton"+id+"' value='Confirm' onclick='confirm("+user_id+", "+id+")'>";
                                     } else {
-                                       confirm="Confirmed"; 
+                                        confirm="Already member of this room / confirmed&nbsp;"; 
                                     }
                                }
                                              
