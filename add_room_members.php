@@ -62,6 +62,9 @@ $roomid="";
                     }).done(function(responseText) {
                          
                         if (responseText.status == 1) {
+                            if (responseText.allow_unjoin==0) {
+                                $('#joinbutton'+roomid).html("You cannot unjoin your own room");
+                            } else
                             if (responseText.joined==0) {
                             $('#joinbutton'+roomid).html("<input type='button' name='add' value='Join the room' onclick=\"join("+roomid+");\">");
                             } else {

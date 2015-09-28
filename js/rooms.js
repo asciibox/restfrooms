@@ -101,7 +101,7 @@
                             var name="";
                           
                           if (responseText.roomlist.length==0) {
-                              $('#roominfo').html('There are no room invitations to others by this user');
+                              $('#roominfo').html('There are no rooms by this user  that you can invite to');
                           }
                           
                            for (var i = 0; i < responseText.roomlist.length; i++) {
@@ -188,12 +188,12 @@
                                var name = array.name;
                                
                                var confirm="";
-                               var dodelete="<input type='button' id='deletebutton"+id+"' value='Delete invitation' onclick='deleteroominvitation("+id+");'>";
+                               var dodelete="<input type='button' id='deletebutton"+array.roomid+"' value='Delete invitation' onclick='deleteroominvitation("+id+");'>";
                                if (direction=="incoming") {
                                   
                                   
                                     if (array.already_room_member==0) {
-                                        confirm="<input type='button' id='confirmbutton"+id+"' value='Confirm' onclick='confirm("+user_id+", "+id+")'>";
+                                        confirm="<input type='button' id='confirmbutton"+array.roomid+"' value='Confirm' onclick='confirm("+user_id+", "+array.roomid+")'>";
                                     } else {
                                         confirm="Already member of this room / confirmed&nbsp;"; 
                                     }

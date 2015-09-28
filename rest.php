@@ -137,6 +137,9 @@ if (strcmp($action, "removefriend")==0) {
     $sql="DELETE FROM friends WHERE ( (destination_user_id='".$destination_user_id."') AND (origin_user_id='".$origin_user_id."') ) OR ( (destination_user_id='".$origin_user_id."') AND (origin_user_id='".$destination_user_id."') ) ";
     $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
    
+    $sql="DELETE FROM friend_invitations WHERE ( (destination_user_id='".$destination_user_id."') AND (origin_user_id='".$origin_user_id."') ) OR ( (destination_user_id='".$origin_user_id."') AND (origin_user_id='".$destination_user_id."') ) ";
+    $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+    
     echo json_encode(array("status" => 1, "msg" => "OK"));
    
     
@@ -184,7 +187,7 @@ if (strcmp($action, "getfriendlist")==0) {
              $friendlist[]=$row['email'];
              $counter++;
          } else {
-             $friendlist[]="not found (".$friendids[$i].")";
+             $friendlist[]="user not found (".$friendids[$i].")";
          }
     }
     echo json_encode(array("status" => 1, "friendlist" => $friendlist));
@@ -353,6 +356,12 @@ if (strcmp($action, "delete_room")==0) {
     $sql="DELETE FROM rooms WHERE (id=".$roomid.")";
     $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
     
+    $sql="DELETE FROM roommembers WHERE (origin_room_id=".$roomid.")";
+    $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+    
+    $sql="DELETE FROM room_invitations WHERE (roomid=".$roomid.")";
+    $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+    
     echo json_encode(array("status" => 1, "msg" => "Deleted"));
     
     
@@ -366,6 +375,14 @@ if (strcmp($action, "joinroom")==0) {
     $roomid="";
     if (isset($_GET['roomid'])) $roomid=$_GET['roomid']; 
     if (strlen($roomid)==0) die(json_encode(array("status" => 0, "msg" => "roomid not set")));
+    
+    $sql="SELECT * FROM rooms WHERE (id=".$roomid.")";
+    $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+    if ($row=$query->fetch_assoc()) {
+        //do nothing
+    } else {
+         die(json_encode(array("status" => 0, "msg" => "Room with the id ".$roomid." not found")));
+    }
     
     $sql="SELECT * FROM roommembers WHERE (origin_room_id=".$roomid.") AND (member_id=".$origin_user_id.")";
          $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
@@ -394,6 +411,15 @@ if (strcmp($action, "unjoinroom")==0) {
     if (isset($_GET['roomid'])) $roomid=$_GET['roomid']; 
     if (strlen($roomid)==0) die(json_encode(array("status" => 0, "msg" => "roomid not set")));
     
+    $sql="SELECT * FROM rooms WHERE (id=".$roomid.")";
+    $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+    if ($row=$query->fetch_assoc()) {
+        if ($row['owner_user_id']==$origin_user_id) {
+            echo json_encode(array("status" => 0, "msg" => "You cannot unjoin your own room"));
+            exit;
+        }
+    }
+    
     $sql="DELETE FROM roommembers WHERE (origin_room_id=".$roomid.") AND (member_id=".$origin_user_id.")";
     
       $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
@@ -410,14 +436,25 @@ if (strcmp($action, "unjoinroom")==0) {
     if (isset($_GET['roomid'])) $roomid=$_GET['roomid']; 
     if (strlen($roomid)==0) die(json_encode(array("status" => 0, "msg" => "roomid not set")));
     
+    $sql="SELECT * FROM rooms WHERE (id=".$roomid.")";
+    $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+    if ($row=$query->fetch_assoc()) {
+        if ($row['owner_user_id']==$origin_user_id) {
+            $allow_unjoin=0;
+        } else {
+            $allow_unjoin=1;
+        }
+    }
+            
+    
     $sql="SELECT * FROM roommembers WHERE (origin_room_id=".$roomid.") AND (member_id=".$origin_user_id.")";
     
     $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
     if ($row=$query->fetch_assoc()) 
     {
-        echo json_encode(array("status" => 1, "joined" => 1, "debug_sql" => $sql));
+        echo json_encode(array("status" => 1, "joined" => 1, "allow_unjoin" => $allow_unjoin, "debug_sql" => $sql));
     } else {
-        echo json_encode(array("status" => 1, "joined" => 0, "debug_sql" => $sql));
+        echo json_encode(array("status" => 1, "joined" => 0, "allow_unjoin" => $allow_unjoin, "debug_sql" => $sql));
     }
     
     
@@ -445,7 +482,7 @@ if (strcmp($action, "getjoinedrooms")==0) {
              $roomlist[]=$row['name'];
              
          } else {
-             $roomlist[]="not found (".$roomids[$i].")";
+             $roomlist[]="room not found (".$roomids[$i].")";
          }
     }
     echo json_encode(array("status" => 1, "roomlist" => $roomlist));

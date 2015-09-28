@@ -40,5 +40,27 @@ while ($row=$query->fetch_assoc()) {
         }
 }
 
+  $sql="SELECT * FROM roommembers";
+    
+    $roomids=array();
+    $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+    while ($row=$query->fetch_assoc()) 
+    {
+        $roomids[]=$row['origin_room_id'];
+    }
+    
+    $roomlist=array();
+    for ($i=0;$i<sizeof($roomids);$i++) {
+         $sql="SELECT * FROM rooms WHERE (id=".$roomids[$i].")";
+         $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+         if ($row=$query->fetch_assoc()) 
+         {
+             
+         } else {
+            $sql2="DELETE FROM roommembers WHERE (origin_room_id=".$roomids[$i].")";
+            $query=DBi::$conn->query($sql2) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql2);
+         }
+    }
+
 if ($echoed==false) header("Location: index.php");
 ?>
