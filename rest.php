@@ -288,7 +288,10 @@ if (strcmp($action, "getroomlist")==0) {
              $getinvitationinfo=true;
          }
          
-        
+         $friends="";
+         if (isset($_GET['friends'])) {
+             $friends=$_GET['friends'];
+         }
          
          if ($getinvitationinfo==true) { // Check if all parameters are set
              if ( (strlen($invitation_by)==0) || (strlen($owner_user_id)==0) ) {
@@ -299,8 +302,22 @@ if (strcmp($action, "getroomlist")==0) {
          $counter=0;
          $roomlist=array();
          $sql="SELECT r.id as r_id, r.*,u.id as u_id, u.* FROM rooms r LEFT JOIN users u ON (r.owner_user_id=u.id)";
-         if (strlen($owner_user_id)>0) {
-             $sql.=" WHERE (owner_user_id=".$owner_user_id.")";
+        
+         if (strcmp($friends,"1")==0) {
+             if (strlen($owner_user_id)>0) {
+               $sql.=" WHERE ( (owner_user_id=".$owner_user_id.")";
+              } else {
+                  $sql.="WHERE ( (false)";
+              }
+              $friendids=getFriendIDS($owner_user_id);
+              for ($i=0;$i<sizeof($friendids);$i++) {
+                $sql.=" OR (owner_user_id=".$friendids[$i].")";
+              }
+              $sql.=")";
+         } else {
+              if (strlen($owner_user_id)>0) {
+               $sql.=" WHERE (owner_user_id=".$owner_user_id.")";
+              }
          }
         
          $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
@@ -388,9 +405,9 @@ if (strcmp($action, "unjoinroom")==0) {
     $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
     if ($row=$query->fetch_assoc()) 
     {
-        echo json_encode(array("status" => 1, "joined" => 1));
+        echo json_encode(array("status" => 1, "joined" => 1, "debug_sql" => $sql));
     } else {
-        echo json_encode(array("status" => 1, "joined" => 0));
+        echo json_encode(array("status" => 1, "joined" => 0, "debug_sql" => $sql));
     }
     
     
@@ -733,13 +750,29 @@ if (strcmp($action, "getroominvitationlistarray")==0) {
     $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
     while ($row=$query->fetch_assoc()) 
     {
+           $direction="incoming";
            if ($row['invitation_to']==$user_id) {
-               $row['direction']="incoming";
                $field_id=$row["invitation_by"];
            } else if ($row['invitation_by']==$user_id) {
-               $row['direction']="outgoing";
+               $direction="outgoing";
                $field_id=$row["invitation_to"];
-           } 
+           }
+           $row['direction']=$direction;
+           
+           // Check if we are already in the room
+           
+           if (strcmp($direction, "incoming")==0) {
+               
+               $sql2="SELECT * FROM roommembers WHERE (origin_room_id=".$row['roomid'].") AND (member_id=".$user_id.")";
+               $row['sql_debug']=$sql2;
+               $query2=DBi::$conn->query($sql2) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+               if ($row2=$query2->fetch_assoc()) {
+                   $row['already_room_member']=1;
+               } else {
+                   $row['already_room_member']=0;
+               }
+           }
+           
            
            $sql2="SELECT * FROM users WHERE (id=".$field_id.")";
          

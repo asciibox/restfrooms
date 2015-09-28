@@ -23,7 +23,7 @@ if (strlen($user_id)==0) die("No user_id set");
                         
                            if (responseText.status == 1) {
                          
-                             $('#joinbutton'+roomid).parent().html('JOINED');
+                             $('#confirmbutton'+roomid).hide();
                         } else {
                             alert(responseText.msg);
                         }

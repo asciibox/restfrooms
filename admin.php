@@ -154,7 +154,7 @@ include("connect_db.php");
                 
                 <input type="button" value="Create room" onclick="window.location.href='create_room.php?origin_owner_id=<?=$row['id']?>';">
                 <input type="button" value="Join (all) rooms" onclick="window.location.href='add_room_members.php?origin_user_id=<?=$row['id']?>';"></td><td id="roomlist<?=$row['id']?>">
-                <input type='button' value="User Room list" onclick="window.location.href='rooms.php?owner_user_id=<?=$row['id']?>';"> <input type='button' value="Invite other users to rooms" onclick="window.location.href='invite_to_room.php?invitation_by=<?=$row['id']?>';"><input type='button' value="Show invitations to room" onclick="window.location.href='show_room_invitations.php?user_id=<?=$row['id']?>';"></td></tr></td></tr>
+                <input type='button' value="User only Room list" onclick="window.location.href='rooms.php?owner_user_id=<?=$row['id']?>';"><input type='button' value="User and friends room list" onclick="window.location.href='rooms.php?owner_user_id=<?=$row['id']?>&friends=1';"> <input type='button' value="Invite other users to rooms" onclick="window.location.href='invite_to_room.php?invitation_by=<?=$row['id']?>';"><input type='button' value="Show invitations to room" onclick="window.location.href='show_room_invitations.php?user_id=<?=$row['id']?>';"></td></tr></td></tr>
        
                 <?php
             }
