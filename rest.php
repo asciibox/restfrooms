@@ -194,13 +194,21 @@ if (strcmp($action, "getfriendlistarray")==0) {
     if (isset($_GET['origin_user_id'])) $origin_user_id=$_GET['origin_user_id']; 
     if (strlen($origin_user_id)==0) die(json_encode(array("status" => 0, "msg" => "origin_user_id not set")));
     
+    // optional:
+    $invite_to_room="";
+    if (isset($_GET['invite_to_room'])) $invite_to_room=$_GET['invite_to_room']; 
+    
+    
+    
     $mode="";
     if (isset($_GET['mode'])) $mode=$_GET['mode']; 
     
     
     if (strcmp($mode,"inverse")!=0) {
+        // Get those to which the user ($origin_user_id) is a friend
         $friendids=getFriendIDS($origin_user_id);
     } else {
+        // Get those which are no friends of the user ($origin_user_id)
         $friendids=getNOTFriendIDS($origin_user_id);
     }
     
@@ -212,6 +220,20 @@ if (strcmp($action, "getfriendlistarray")==0) {
          $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
          if ($row=$query->fetch_assoc()) 
          {
+             
+             // optional, only when invitation_to_room is set
+             if (strlen($invite_to_room)>0) {
+                    $sql2="SELECT * FROM room_invitations WHERE (roomid=".$invite_to_room.") AND (invitation_by=".$origin_user_id.") AND (invitation_to=".$row['id'].")";
+                    $query2=DBi::$conn->query($sql2) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+                    if ($row2=$query2->fetch_assoc())
+                    {
+                                $row['invited']=1;
+                    } else {
+                                $row['invited']=0;
+                    }
+             }
+             
+             
              $friendlistarray[]=$row;
              $counter++;
          }

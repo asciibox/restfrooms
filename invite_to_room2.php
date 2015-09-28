@@ -34,7 +34,7 @@ include("connect_db.php");
                         if (responseText.status == 1) {
                          
                         
-                           $('#invitebutton'+invite_to).html('INVITED');
+                           $('#invitebutton'+invite_to).parent().html('INVITED');
                       
                         } else {
                             alert(responseText.msg);

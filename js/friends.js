@@ -10,10 +10,15 @@
              alert("Please provide a valid origin_user_id");
              return;
          }
+         
+         var invite_to_room_parameter="";
+         if (mode=="INVITE") {
+             invite_to_room_parameter="&invite_to_room="+invite_to_room;
+         }
         
          counter=0;
          $.ajax({
-                        url: "rest.php?action=getfriendlistarray&origin_user_id="+origin_user_id,
+                        url: "rest.php?action=getfriendlistarray&origin_user_id="+origin_user_id+invite_to_room_parameter,
                         type: "GET",
                         async : false,
                         dataType: "json",
@@ -41,7 +46,11 @@
                               var additional="";
                               
                               if (mode=="INVITE") {
-                                  additional="<td><input type='button' id='invitebutton"+id+"' value='invite' onclick='inviteUserToRoom("+invite_by_user+", "+id+", "+invite_to_room+")'></td>"
+                                  if (friendarray.invited==0) {
+                                    additional="<td><input type='button' id='invitebutton"+id+"' value='invite' onclick='inviteUserToRoom("+invite_by_user+", "+id+", "+invite_to_room+")'></td>";
+                                  } else {
+                                    additional="<td>Already invited</td>";
+                                  }
                               }
                               
                               var id = 
