@@ -163,6 +163,7 @@ include("connect_db.php");
 </table>
 
 <input type="button" value="Add a new user" onclick="window.location.href='register.php';"><input type="button" value="Login" onclick="window.location.href='login.php';">
+<input type="button" value="Create 10 dummy users" onclick="window.location.href='create_dummy_users.php';">
 
 <span id='editor' style='display:none'>
     id:<input type="text" id="id" value="">
@@ -177,4 +178,5 @@ include("connect_db.php");
     
 </span>
 <input type="button" value="Logout" onclick="localStorage.removeItem('email');localStorage.removeItem('md5pwd');window.location.href='index.php';">
+<input type='button' value="Search users demo" onclick="window.location.href='search_users_demo.php';">
 <input type='button' value="Remove nonexisting room owners and friends" onclick="window.location.href='admin_remove_nonexisting.php';"></td></tr>

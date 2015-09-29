@@ -851,5 +851,43 @@ if (strcmp($action, "delete_room_invitation")==0) {
     echo json_encode(array("status" => 1, "msg" => "Deleted"));
     
     
+} else if (strcmp($action,"searchuser")==0) {
+    
+        $name="";
+        if (isset($_GET['name'])) $name=$_GET['name'];
+        if (strlen($name)==0) die(json_encode(array("status" => 0, "msg" => "No name set")));
+        
+        $page=0;
+        if (isset($_GET['page'])) $page=$_GET['page'];
+        if ( (strlen($page)==0) || ($page==0) ) die(json_encode(array("status" => 0, "msg" => "No page set")));
+        
+        $items_per_page=0;
+        if (isset($_GET['items_per_page'])) $items_per_page=$_GET['items_per_page'];
+        if ( (strlen($items_per_page)==0) || ($items_per_page==0) ) die(json_encode(array("status" => 0, "msg" => "No items_per_page set")));
+    
+       $users=array();
+       $where="";
+       if (strlen($name)>0) {
+           $where=" WHERE (UPPER(first_name) LIKE '%".strtoupper($name)."%') OR (UPPER(last_name) LIKE '%".strtoupper($name)."%') OR (UPPER(email) LIKE '%".strtoupper($name)."%')";
+       }
+       
+       $start=($page-1)*$items_per_page;
+       
+       
+       $sql="SELECT * FROM users ".$where." LIMIT ".$start.",".$items_per_page;
+       $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+       while ($row=$query->fetch_assoc()) {
+           $user=array();
+           $user['title']=$row['title'];
+           $user['first_name']=$row['first_name'];
+           $user['last_name']=$row['last_name'];
+           $user['email']=$row['email'];
+           $user['id']=$row['id'];
+           $user['avatar_url']=$row['avatar_url'];
+           $users[] = $user;
+       }
+       
+       echo json_encode(array("status" => 1, "users" => $users));
+    
 }
     
