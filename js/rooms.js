@@ -86,6 +86,9 @@
          if (mode.indexOf("FRIENDS")!=-1) {
              additional_parameters+="&friends=1";
          }
+		  if (mode.indexOf("JOINED")!=-1) {
+             additional_parameters+="&joined_only=1";
+         }
          
          counter=0;
          $.ajax({

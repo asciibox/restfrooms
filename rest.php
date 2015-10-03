@@ -291,6 +291,11 @@ if (strcmp($action, "getroomlist")==0) {
          if (isset($_GET['owner_user_id'])) {
              $owner_user_id=$_GET['owner_user_id'];
          }
+
+		 $joined_only="";
+         if (isset($_GET['joined_only'])) {
+             $joined_only=$_GET['joined_only'];
+         }
     
          $getinvitationinfo=false;
        
@@ -315,11 +320,19 @@ if (strcmp($action, "getroomlist")==0) {
          $counter=0;
          $roomlist=array();
          $sql="SELECT r.id as r_id, r.*,u.id as u_id, u.* FROM rooms r LEFT JOIN users u ON (r.owner_user_id=u.id)";
-        
-         if (strcmp($friends,"1")==0) {
+        if (strcmp($joined_only,"1")==0) {
+
+			  $sql.=" WHERE (owner_user_id=".$owner_user_id.")";
+			  $friendids=getFriendIDS($owner_user_id);
+              for ($i=0;$i<sizeof($friendids);$i++) {
+                $sql.=" OR (owner_user_id=".$friendids[$i].")";
+              }
+
+		} else if (strcmp($friends,"1")==0) {
              if (strlen($owner_user_id)>0) {
                $sql.=" WHERE ( (owner_user_id=".$owner_user_id.")";
-              } else {
+              } else 
+				  {
                   $sql.="WHERE ( (false)";
               }
               $friendids=getFriendIDS($owner_user_id);
@@ -336,14 +349,26 @@ if (strcmp($action, "getroomlist")==0) {
          $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
          while ($row=$query->fetch_assoc()) 
          {
-            
-             $member_ids=getRoomMembers($row['r_id'], false);
-             $members = getRoomMembers($row['r_id'], true);
-             $array=array("name" => $row['name'], "room_id" => $row['r_id'], "member_ids" => $member_ids, "members" => $members, "owner_user_id" => $row['owner_user_id'], "user_id" => $row['u_id'], "email" => $row['email'], "title" => $row['title'], "first_name" => $row['first_name'], "last_name" => $row['last_name']);
-             
-           
-             $roomlist[]=$array;
-             $counter++;
+   			    $continue=true;
+				if (strcmp($joined_only,"1")==0) {
+					$sql2="SELECT* FROM roommembers WHERE (member_id=".$owner_user_id.") AND (origin_room_id=".$row['r_id'].")";
+				
+					$query2=DBi::$conn->query($sql2) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql2);
+					if ($row2=$query2->fetch_assoc()) {
+					}
+					else {
+						$continue=false;
+					}
+
+				}
+
+            if ($continue) {
+					 $member_ids=getRoomMembers($row['r_id'], false);
+					 $members = getRoomMembers($row['r_id'], true);
+					 $array=array("name" => $row['name'], "room_id" => $row['r_id'], "member_ids" => $member_ids, "members" => $members, "owner_user_id" => $row['owner_user_id'], "user_id" => $row['u_id'], "email" => $row['email'], "title" => $row['title'], "first_name" => $row['first_name'], "last_name" => $row['last_name']);
+					 $roomlist[]=$array;
+					 $counter++;
+			}
          }
     echo json_encode(array("status" => 1, "roomlist" => $roomlist));
 }  else
@@ -571,9 +596,22 @@ if (strcmp($action, "update_room")==0) {
     if (strcmp($action, "delete_user")==0) {
         $id=$_GET['id'];
         
-        $sql="DELETE FROM users WHERE (id=".$id.")";
-    
+        $sql="DELETE FROM users WHERE (id=".$id.")";    
         $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+
+		$sql="DELETE FROM roommembers WHERE (member_id=".$id.")";
+		$query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+
+		$sql="DELETE FROM rooms WHERE (member_id=".$id.")";
+		$query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+
+		$sql="DELETE FROM friend_invitations WHERE (origin_user_id=".$id.") OR (destination_user_id=".$id.")";
+		$query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+
+		$sql="DELETE FROM room_invitations WHERE (invitation_to=".$id.") OR (invitation_by=".$id.")";
+		$query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+
+
         echo json_encode(array("status" => 1, "msg" => "OK"));
 } else if (strcmp($action, "getuserlist")==0) {
     
