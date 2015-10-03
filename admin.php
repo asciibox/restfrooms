@@ -150,12 +150,16 @@ include("connect_db.php");
                  ?>
         <tr id="tr<?=$row['id']?>"><td><input type='button' value='Edit' onclick='edit(<?=$row['id']?>);'><input type='button' value='Delete' onclick='delete_user(<?=$row['id']?>);'></td><td class='id'><?=$row['id']?></td><td><?=$row['email']?></td><td><?=$row['title']?></td><td><?=$row['first_name']?></td><td><?=$row['last_name']?></td>
             <td><?=$row['md5pwd']?></td><td><?=$row['sex']?></td><td id="friendlist<?=$row['id']?>">
-                <input type="button" value="Show friends" onclick="window.location.href='show_friends.php?origin_user_id=<?=$row['id']?>';"><input type="button" value="Show friend requests" onclick="window.location.href='show_friend_requests.php?origin_user_id=<?=$row['id']?>';"><input type="button" value="Send friend request" onclick="window.location.href='send_friend_request.php?origin_user_id=<?=$row['id']?>';"><input type="button" value="Add friends" onclick="window.location.href='add_friends.php?origin_user_id=<?=$row['id']?>';"><input type="button" value="Remove friends" onclick="window.location.href='remove_friends.php?origin_user_id=<?=$row['id']?>';"></td><td>
+                <input type="button" value="Show friends" onclick="window.location.href='show_friends.php?origin_user_id=<?=$row['id']?>';"><input type="button" value="Show friend requests" onclick="window.location.href='show_friend_requests.php?origin_user_id=<?=$row['id']?>';"><input type="button" value="Send friend request" onclick="window.location.href='send_friend_request.php?origin_user_id=<?=$row['id']?>';">
+				<input type='button' value="Search users demo" onclick="window.location.href='search_users_demo.php?origin_user_id=<?=$row['id']?>';">
+				<input type="button" value="Add friends" onclick="window.location.href='add_friends.php?origin_user_id=<?=$row['id']?>';">
+				<input type="button" value="Remove friends" onclick="window.location.href='remove_friends.php?origin_user_id=<?=$row['id']?>';"></td><td>
                 
                 <input type="button" value="Create room" onclick="window.location.href='create_room.php?origin_owner_id=<?=$row['id']?>';">
                 <input type="button" value="Join (all) rooms" onclick="window.location.href='add_room_members.php?origin_user_id=<?=$row['id']?>';"></td><td id="roomlist<?=$row['id']?>">
                 <input type='button' value="User only Room list" onclick="window.location.href='rooms.php?owner_user_id=<?=$row['id']?>';"><input type='button' value="User and friends room list" onclick="window.location.href='rooms.php?owner_user_id=<?=$row['id']?>&friends=1';"> <input type='button' value="Invite other users to rooms" onclick="window.location.href='invite_to_room.php?invitation_by=<?=$row['id']?>';"><input type='button' value="Show invitations to room" onclick="window.location.href='show_room_invitations.php?user_id=<?=$row['id']?>';"></td></tr></td></tr>
        
+
                 <?php
             }
   
@@ -178,5 +182,4 @@ include("connect_db.php");
     
 </span>
 <input type="button" value="Logout" onclick="localStorage.removeItem('email');localStorage.removeItem('md5pwd');window.location.href='index.php';">
-<input type='button' value="Search users demo" onclick="window.location.href='search_users_demo.php';">
 <input type='button' value="Remove nonexisting room owners and friends" onclick="window.location.href='admin_remove_nonexisting.php';"></td></tr>

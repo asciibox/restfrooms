@@ -1,5 +1,11 @@
 <?php
 include("connect_db.php");
+
+$origin_user_id="";
+if (isset($_GET['origin_user_id'])) $origin_user_id=$_GET['origin_user_id'];
+if (strlen($origin_user_id)>0) {
+	$additional_parameters="&get_invite_status_by_origin_user_id=".$origin_user_id;
+}
 ?>
 <link href="body.css" rel="stylesheet" type="text/css" media="screen" />
 <script src="js/jquery.min.js"></script>
@@ -15,7 +21,7 @@ include("connect_db.php");
     function search(name, itemsPerPage) {
         
         $.ajax({
-                        url: "rest.php?action=searchuser&name="+name+"&page="+$('#current_page').html()+"&items_per_page="+itemsPerPage,
+                        url: "rest.php?action=searchuser&name="+name+"&page="+$('#current_page').html()+"&items_per_page="+itemsPerPage+"<?=$additional_parameters?>",
                         type: "GET",
                         async : false,
                         dataType: "json",

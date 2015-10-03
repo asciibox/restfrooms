@@ -853,6 +853,9 @@ if (strcmp($action, "delete_room_invitation")==0) {
     
 } else if (strcmp($action,"searchuser")==0) {
     
+		$get_invite_status_by_origin_user_id="";
+		if (isset($_GET['get_invite_status_by_origin_user_id'])) $get_invite_status_by_origin_user_id=$_GET['get_invite_status_by_origin_user_id'];
+
         $name="";
         if (isset($_GET['name'])) $name=$_GET['name'];
         if (strlen($name)==0) die(json_encode(array("status" => 0, "msg" => "No name set")));
@@ -884,7 +887,20 @@ if (strcmp($action, "delete_room_invitation")==0) {
            $user['email']=$row['email'];
            $user['id']=$row['id'];
            $user['avatar_url']=$row['avatar_url'];
-           $users[] = $user;
+         
+
+		   if (strlen($get_invite_status_by_origin_user_id)>0) {
+			 
+			   $user['already_invited']=0;
+			   $sql="SELECT * FROM room_invitations WHERE (invitation_by=".$get_invite_status_by_origin_user_id.") AND (invitation_to=".$row['id'].")";
+			    $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+		        if ($row=$query->fetch_assoc()) {
+					$user['already_invited']=1;
+				}
+		   }
+
+		     $users[] = $user;
+
        }
        
        echo json_encode(array("status" => 1, "users" => $users));
