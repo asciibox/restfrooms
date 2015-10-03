@@ -2,6 +2,8 @@
 header("Location: admin.php");
 exit;
 include("connect_db.php");
+
+
 ?>
 <link href="body.css" rel="stylesheet" type="text/css" media="screen" />
 <script src="js/jquery.min.js"></script>
