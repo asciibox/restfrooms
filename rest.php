@@ -916,6 +916,8 @@ if (strcmp($action, "delete_room_invitation")==0) {
        
        
        $sql="SELECT * FROM users ".$where." LIMIT ".$start.",".$items_per_page;
+	   $debug_sql=$sql;
+
        $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
        while ($row=$query->fetch_assoc()) {
            $user=array();
@@ -928,9 +930,9 @@ if (strcmp($action, "delete_room_invitation")==0) {
          
 
 			   $user['already_invited']=0;
-			   $sql="SELECT * FROM friend_invitations WHERE (origin_user_id=".$get_invite_status_by_origin_user_id.") AND (destination_user_id=".$row['id'].")";
-			    $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
-		        if ($row=$query->fetch_assoc()) {
+			   $sql2="SELECT * FROM friend_invitations WHERE (origin_user_id=".$get_invite_status_by_origin_user_id.") AND (destination_user_id=".$row['id'].")";
+			    $query2=DBi::$conn->query($sql2) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+		        if ($row2=$query2->fetch_assoc()) {
 					$user['already_invited']=1;
 				}
 	
@@ -939,7 +941,7 @@ if (strcmp($action, "delete_room_invitation")==0) {
 
        }
        
-       echo json_encode(array("status" => 1, "users" => $users));
+       echo json_encode(array("status" => 1, "users" => $users, "debug_sql" => $debug_sql));
     
 }
     
