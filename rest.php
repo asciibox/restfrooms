@@ -596,13 +596,10 @@ if (strcmp($action, "update_room")==0) {
     if (strcmp($action, "delete_user")==0) {
         $id=$_GET['id'];
         
-        $sql="DELETE FROM users WHERE (id=".$id.")";    
-        $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
-
 		$sql="DELETE FROM roommembers WHERE (member_id=".$id.")";
 		$query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
 
-		$sql="DELETE FROM rooms WHERE (member_id=".$id.")";
+		$sql="DELETE FROM rooms WHERE (owner_user_id=".$id.")";
 		$query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
 
 		$sql="DELETE FROM friend_invitations WHERE (origin_user_id=".$id.") OR (destination_user_id=".$id.")";
@@ -610,6 +607,9 @@ if (strcmp($action, "update_room")==0) {
 
 		$sql="DELETE FROM room_invitations WHERE (invitation_to=".$id.") OR (invitation_by=".$id.")";
 		$query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
+
+		$sql="DELETE FROM users WHERE (id=".$id.")";    
+        $query=DBi::$conn->query($sql) or die(DBi::$conn->error." ".__FILE__." line ".__LINE__.$sql);
 
 
         echo json_encode(array("status" => 1, "msg" => "OK"));
